@@ -50,3 +50,26 @@ function add_custom_product_store_data($stores)
     return $stores;
 }
 add_filter('woocommerce_data_stores', 'add_custom_product_store_data', 10, 1);
+
+function add_custom_product_tab($tabs)
+{
+    global $post;
+    if (!$post) {
+        return $tabs;
+    }
+    $product = wc_get_product($post->ID);
+    if (!$product) {
+        return $tabs;
+    }
+    $product_type = $product->get_type();
+
+    if ($product_type !== 'custom_product') {
+        return $tabs;
+    }
+
+    array_push($tabs['variations']['class'], 'show_if_custom_product');
+    unset($tabs['general']);
+    unset($tabs['inventory']);
+    return $tabs;
+}
+add_filter('woocommerce_product_data_tabs', 'add_custom_product_tab');
